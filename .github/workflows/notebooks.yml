@@ -1,0 +1,23 @@
+name: Exécution des notebooks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  executer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt ipykernel
+      - name: Regénérer les données (doivent être identiques)
+        run: |
+          python scripts/generer_donnees.py
+          git diff --exit-code data/brutes
+      - name: Exécuter tous les cours et corrigés
+        run: python scripts/construire.py
